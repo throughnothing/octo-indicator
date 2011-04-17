@@ -5,10 +5,14 @@
 
 Currently requires `feedparser`, `github2`, `pygtk` python modules.  If you have all the modules, just modify octo-indicator's GH\_USER and GH\_TOKEN values near the top of the file and then run it.
 
+It currently reads your github username/token from `~/.octoindicatorrc`
+
+    [github]
+    user=throughnothing
+    token=<TOKEN-HERE>
 
 # TODO
 
-* Get an octocat icon!
 * Use config file/dconf (preferably dconf)
 * Pull gravatar icons
 * Add libnotify support
