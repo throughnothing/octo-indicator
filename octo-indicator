@@ -10,7 +10,7 @@ import os
 import webbrowser
 
 GH_FEED_UPDATE_INTERVAL=1000*60*10 # 10 minutes
-GH_FEED_ITEMS=25
+GH_FEED_ITEMS=30
 
 class OctoIndicator(object):
     def __init__(self):
@@ -34,6 +34,16 @@ class OctoIndicator(object):
 
         # create a menu
         self.menu = gtk.Menu()
+        clear_item = gtk.MenuItem('Mark all as seen')
+        self.menu.append(clear_item)
+        clear_item.connect("activate", self.mark_read_click)
+        
+        #Separator
+        separator_item = gtk.SeparatorMenuItem()
+        self.menu.append(separator_item)
+
+        separator_item.show()
+        clear_item.show()
 
         # Get initial feed
         self.update_feed()
@@ -55,21 +65,22 @@ class OctoIndicator(object):
             t = entry['title_detail']['value']
             menu_item = gtk.MenuItem(t)
             self.menu.append(menu_item)
-            menu_item.connect("activate", self.menuitem_response,entry)
+            menu_item.connect("activate", self.feeditem_click,entry)
             menu_item.show()
 
         # Clear old entries
         cur_menu_items = self.menu.get_children()
-        for i in range(GH_FEED_ITEMS,len(cur_menu_items)):
+        for i in range(GH_FEED_ITEMS,len(cur_menu_items) - 2):
             self.menu.remove(cur_menu_items[i])
 
         gtk.timeout_add(GH_FEED_UPDATE_INTERVAL, self.update_feed)
 
-
-
-    def menuitem_response(self, w, entry):
+    def feeditem_click(self, w, entry):
         self.ind.set_status (appindicator.STATUS_ACTIVE)
         webbrowser.open(entry['links'][0]['href'])
+
+    def mark_read_click(self, w):
+        self.ind.set_status (appindicator.STATUS_ACTIVE)
 
 
 if __name__ == "__main__":
