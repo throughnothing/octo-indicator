@@ -8,6 +8,7 @@ Currently requires `feedparser`, `github2`, `pygtk` python modules.  If you have
 
 # TODO
 
+* Get an octocat icon!
 * Use config file/dconf (preferably dconf)
 * Pull gravatar icons
 * Add libnotify support
