@@ -4,8 +4,6 @@ import gobject
 import gtk
 
 import feedparser
-import json
-import httplib2
 import github2.client as gh
 import webbrowser
 
