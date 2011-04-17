@@ -1,0 +1,71 @@
+#!/usr/bin/env python
+import appindicator
+import gobject
+import gtk
+
+import feedparser
+import json
+import httplib2
+import github2.client as gh
+import webbrowser
+
+######################################################
+#  Put yous github username and API Token here
+######################################################
+GH_USER=""
+GH_TOKEN=""
+
+
+GH_FEED_URL="https://github.com/%s.private.atom?token=%s" % (GH_USER, GH_TOKEN)
+GH_FEED_UPDATE_INTERVAL=1000*60*10 # 10 minutes
+GH_FEED_ITEMS=25
+
+latest_entry_id = ''
+
+def update_feed(menu):
+    global latest_entry_id
+    gh_feed = feedparser.parse(GH_FEED_URL)
+
+    for entry in gh_feed['entries']:
+        if entry['id'] == latest_entry_id:
+            latest_entry_id = entry['id']
+            break
+
+        latest_entry_id = entry['id']
+        t = entry['title_detail']['value']
+        menu_item = gtk.MenuItem(t)
+        menu.append(menu_item)
+        # this is where you would connect your menu item up with a function:
+        menu_item.connect("activate", menuitem_response, entry)
+        # show the items
+        menu_item.show()
+
+    # Clear old entries
+    cur_menu_items = menu.get_children()
+    for i in range(GH_FEED_ITEMS,len(cur_menu_items)):
+        menu.remove(cur_menu_items[i])
+
+    gtk.timeout_add(GH_FEED_UPDATE_INTERVAL, update_feed, menu)
+
+def menuitem_response(w, entry):
+    webbrowser.open(entry['links'][0]['href'])
+    
+
+if __name__ == "__main__":
+    ind = appindicator.Indicator ("octo-indicator",
+                              "indicator-messages",
+                              appindicator.CATEGORY_COMMUNICATIONS)
+    ind.set_status (appindicator.STATUS_ACTIVE)
+    ind.set_attention_icon ("indicator-messages-new")
+
+    # create a menu
+    menu = gtk.Menu()
+
+    # Get initial feed
+    update_feed(menu)
+
+    ind.set_menu(menu)
+
+    gtk.main()
+
+
