@@ -83,7 +83,7 @@ class OctoIndicator(object):
             menu_item.show()
 
 
-        gtk.timeout_add(3000, self.update_feed)
+        gtk.timeout_add(GH_FEED_UPDATE_INTERVAL, self.update_feed)
 
     def feeditem_click(self, w, entry):
         self.ind.set_status (appindicator.STATUS_ACTIVE)
