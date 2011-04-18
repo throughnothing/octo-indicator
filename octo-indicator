@@ -10,7 +10,8 @@ import os
 import webbrowser
 
 GH_FEED_UPDATE_INTERVAL=1000*60*10 # 10 minutes
-GH_FEED_ITEMS=30
+GH_FEED_UPDATE_INTERVAL=15000 # 15 seconds
+GH_FEED_ITEMS=10
 
 class OctoIndicator(object):
     def __init__(self):
@@ -19,6 +20,7 @@ class OctoIndicator(object):
         self.gh_user=self.config.get('github','user')
         self.gh_token=self.config.get('github','token')
         self.latest_entry_id = ''
+
         if not self.gh_user or not self.gh_token:
             raise Exception('User or Token could not be found in ~/.octoindicatorrc') 
         self.gh_feed_url = ("https://github.com/%s.private.atom?token=%s" % 
@@ -45,35 +47,43 @@ class OctoIndicator(object):
         separator_item.show()
         clear_item.show()
 
-        # Get initial feed
-        self.update_feed()
-
         self.ind.set_menu(self.menu)
+
+        # Get initial feed
+        gtk.timeout_add(100,self.update_feed)
 
         gtk.main()
 
+
     def update_feed(self):
         gh_feed = feedparser.parse(self.gh_feed_url)
+
+        if gh_feed['entries'][0]['id'] == self.latest_entry_id:
+            return # nothing to update
+
+        # Clear old entries
+        cur_menu_items = self.menu.get_children()
+        for i in range(2,len(cur_menu_items)):
+            self.menu.remove(cur_menu_items[i])
+
+        self.latest_entry_id = gh_feed['entries'][0]['id']
+        self.ind.set_status (appindicator.STATUS_ATTENTION)
+
+        # Repopulate menu items
+        i = 0
         for entry in gh_feed['entries']:
-            if entry['id'] == self.latest_entry_id:
-                self.latest_entry_id = entry['id']
+            i = i + 1
+            if i > GH_FEED_ITEMS:
                 break
 
-            self.ind.set_status (appindicator.STATUS_ATTENTION)
-
-            self.latest_entry_id = entry['id']
             t = entry['title_detail']['value']
             menu_item = gtk.MenuItem(t)
             self.menu.append(menu_item)
             menu_item.connect("activate", self.feeditem_click,entry)
             menu_item.show()
 
-        # Clear old entries
-        cur_menu_items = self.menu.get_children()
-        for i in range(GH_FEED_ITEMS,len(cur_menu_items) - 2):
-            self.menu.remove(cur_menu_items[i])
 
-        gtk.timeout_add(GH_FEED_UPDATE_INTERVAL, self.update_feed)
+        gtk.timeout_add(3000, self.update_feed)
 
     def feeditem_click(self, w, entry):
         self.ind.set_status (appindicator.STATUS_ACTIVE)
