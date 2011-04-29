@@ -11,6 +11,10 @@ It currently reads your github username/token from `~/.octoindicatorrc`
     user=throughnothing
     token=<TOKEN-HERE>
 
+Once you have all of the requirements, you can install with
+    
+    python setup.py install
+
 # TODO
 
 * Use config file/dconf (preferably dconf)

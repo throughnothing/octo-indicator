@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Octoindicator
+Comment=Octoindicator application
+Categories=GNOME;Utility;
+Exec=octoindicator
+Icon=/usr/share/octoindicator/media/octoindicator.svg
+Terminal=false
+Type=Application
