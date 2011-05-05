@@ -85,7 +85,6 @@ class OctoindicatorWindow(object):
         gh_feed = feedparser.parse(self.gh_feed_url)
 
         if gh_feed['entries'][0]['id'] == self.latest_entry_id:
-            print "nothing to update"
             gtk.timeout_add(GH_FEED_UPDATE_INTERVAL, self.update_feed)
             return # nothing to update
 
